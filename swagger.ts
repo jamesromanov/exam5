@@ -9,6 +9,13 @@ const swaggerSpec = swaggerJsDoc({
       description: "This is a small version of the linked in version for exam5",
     },
     components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
       schemas: {
         Users: {
           type: "object",
@@ -62,6 +69,11 @@ const swaggerSpec = swaggerJsDoc({
         },
       },
     },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
     tags: [{ name: "Users", description: "This is a user crud!" }],
   },
   apis: ["./swagger.ts", "./routes/*.ts"],

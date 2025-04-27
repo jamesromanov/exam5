@@ -1,5 +1,6 @@
 import express from "express";
 import * as authController from "../controllers/auth.controller";
+import protector from "../middlewares/protector";
 
 const authRouter = express.Router();
 /**
@@ -33,6 +34,8 @@ authRouter.route("/register").post(authController.register);
  *  post:
  *   summary: User log in!
  *   tags: [Users]
+ *   security:
+ *     - bearerAuth: []
  *   description: This is user log in!
  *   requestBody:
  *     required: true
@@ -52,6 +55,6 @@ authRouter.route("/register").post(authController.register);
  *
  */
 
-authRouter.route("/login").post(authController.login);
+authRouter.route("/login").post(protector, authController.login);
 
 export default authRouter;

@@ -72,7 +72,7 @@ sequelize
     console.log("Table created successfully!");
   })
   .catch((err) => {
-    console.log("Error while creating table:", err);
+    // console.log("Error while creating table:", err);
   });
 
 export default User;

@@ -3,7 +3,7 @@ import errorHandler from "../utils/errorHandler";
 import { response } from "../utils/response";
 import User from "../models/user.model";
 import Joi, { ValidationResult } from "joi";
-import { UserLogin, Users } from "../types/User";
+import { UserHidden, UserLogin, Users } from "../types/User";
 import bcrypt from "bcryptjs";
 
 import env from "dotenv";
@@ -47,8 +47,11 @@ const register = errorHandler(
     }
 
     let user = await User.create(body);
-
-    response(res, user);
+    let hiddenDetails = JSON.parse(JSON.stringify(user)) as UserHidden;
+    delete hiddenDetails.role;
+    delete hiddenDetails.password;
+    delete hiddenDetails.isActive;
+    response(res, hiddenDetails);
   }
 );
 const loginValidator = Joi.object({

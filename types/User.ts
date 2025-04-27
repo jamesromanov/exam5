@@ -17,4 +17,15 @@ interface UserLogin {
   password: string;
 }
 
-export { Users, UsersCreate, UserLogin };
+interface UserHidden {
+  name: string;
+  email: string;
+  age: number;
+  password?: string;
+  role?: string;
+  isActive?: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export { Users, UsersCreate, UserLogin, UserHidden };
