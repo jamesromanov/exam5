@@ -3,7 +3,7 @@ import errorHandler from "../utils/errorHandler";
 import { response } from "../utils/response";
 import User from "../models/user.model";
 import Joi from "joi";
-import { Users, UsersCreate } from "../types/User";
+import { Users } from "../types/User";
 
 const registerValidator = Joi.object({
   name: Joi.string().min(3).required(),
@@ -40,9 +40,10 @@ const register = errorHandler(
     }
 
     let user = await User.create(body);
-    let hiddenDetails = user.toJSON();
-    delete hiddenDetails.role;
-    delete hiddenDetails.password;
-    delete hiddenDetails.isActive;
+    let hiddenDetails: Omit<Users, "role" | "password" | "isActive"> = {
+      ...user,
+    };
+    response(res, hiddenDetails);
   }
 );
+export { register };

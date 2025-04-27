@@ -1,8 +1,6 @@
 import { Optional } from "sequelize";
 
 interface Users {
-  toJSON(): unknown;
-  id: number;
   name: string;
   email: string;
   age: number;
@@ -12,7 +10,6 @@ interface Users {
   createdAt: Date;
   updatedAt: Date;
 }
-interface UsersCreate
-  extends Optional<Users, "id" | "createdAt" | "updatedAt"> {}
+interface UsersCreate extends Optional<Users, "createdAt" | "updatedAt"> {}
 
 export { Users, UsersCreate };

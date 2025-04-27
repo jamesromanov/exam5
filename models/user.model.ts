@@ -23,7 +23,6 @@ class User extends Model<Users, UsersCreate> implements Users {
 }
 User.init(
   {
-    id: "",
     name: { type: DataTypes.STRING, allowNull: false },
     email: {
       type: DataTypes.STRING,
