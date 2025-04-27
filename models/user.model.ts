@@ -50,7 +50,7 @@ User.init(
       },
     },
     role: {
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM("user", "admin"),
       defaultValue: "user",
     },
     isActive: { type: DataTypes.BOOLEAN, defaultValue: true },

@@ -12,4 +12,9 @@ interface Users {
 }
 interface UsersCreate extends Optional<Users, "createdAt" | "updatedAt"> {}
 
-export { Users, UsersCreate };
+interface UserLogin {
+  email: string;
+  password: string;
+}
+
+export { Users, UsersCreate, UserLogin };
