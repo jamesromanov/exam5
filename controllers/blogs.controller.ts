@@ -2,11 +2,12 @@ import { NextFunction, Response, Request } from "express";
 import { RequestCustom, UserPro } from "../types/User";
 import errorHandler from "../utils/errorHandler";
 import Joi, { ValidationResult } from "joi";
-import { Blogs } from "../types/Blogs";
+import { BlogOwner, Blogs } from "../types/Blogs";
 import { response } from "../utils/response";
 import Blog from "../models/blog.model";
 import Follower from "../models/follower.model";
 import { ID } from "../types/id";
+import { Op } from "sequelize";
 
 const blogsValidator = Joi.object({
   title: Joi.string().min(3).required(),
@@ -39,6 +40,7 @@ const getMyBlogs = errorHandler(
       await Blog.findAndCountAll({
         where: {
           user_id: req.user?.id,
+          isActive: true,
         },
         limit,
         offset,
@@ -69,6 +71,7 @@ const getMyJoinedBlogs = errorHandler(
       await Follower.findAndCountAll({
         where: {
           follower_id: parentId,
+          isActive: true,
         },
         attributes: [],
         include: [
@@ -102,7 +105,12 @@ const getBlogInfo = errorHandler(
     let { error: idErr, value: polishedId }: ValidationResult<ID> =
       idValidator.validate(req.params);
     if (idErr) return response(res, idErr.details[0].message, 409);
-    let blog = await Blog.findByPk(polishedId.blogId);
+    let blog = await Blog.findOne({
+      where: {
+        id: polishedId.blogId,
+        isActive: true,
+      },
+    });
     console.log(blog);
     if (!blog) return response(res, "No blogs found!", 404);
 
@@ -123,17 +131,68 @@ const updateBlogById = errorHandler(
     if (idErr) return response(res, idErr.details[0].message, 409);
 
     let { error: bodyErr, value: body } = updateValidator.validate(req.body);
-    console.log(req.body);
     if (bodyErr) return response(res, bodyErr.details[0].message, 409);
-    let blog = await Blog.findByPk(polishedId.blogId);
+    let blog = await Blog.findOne({
+      where: { id: polishedId.blogId, isActive: true },
+    });
     if (!blog) return response(res, "No blogs found!", 404);
-    if (body.title) blog.title = body.title ?? blog.title;
-    if (body.content) blog.content = body.content ?? blog.content;
-    if (body.user_id) blog.user_id = body.user_id ?? blog.user_id;
-    if (body.image) blog.image = body.image ?? blog.image;
-    if (body.isActive) blog.isActive = body.isActive ?? blog.isActive;
+    blog.title = body.title ?? blog.title;
+    blog.content = body.content ?? blog.content;
+    blog.user_id = body.user_id ?? blog.user_id;
+    blog.image = body.image ?? blog.image;
+    blog.isActive = body.isActive ?? blog.isActive;
     await blog.save();
     response(res, blog);
+  }
+);
+
+const deleteBlogsById = errorHandler(
+  async (req: RequestCustom, res: Response, next: NextFunction) => {
+    let { error: idErr, value: polishedId }: ValidationResult<ID> =
+      idValidator.validate(req.params);
+    if (idErr) return response(res, idErr.details[0].message, 409);
+    let blogExists = await Blog.findOne({
+      where: { id: polishedId.blogId, isActive: true },
+    });
+    if (!blogExists) return response(res, "No blogs found!", 404);
+
+    blogExists.isActive = false;
+    await blogExists.save();
+    response(res, null, 204);
+  }
+);
+
+const searchBlog = errorHandler(
+  async (req: RequestCustom, res: Response, next: NextFunction) => {
+    let title = req.query.title || "";
+    let limit = Number(req.query.limit);
+    let page = Number(req.query.page);
+
+    if (isNaN(limit) || limit < 1) limit = 10;
+    if (isNaN(page) || page < 1) page = 1;
+
+    let offset = (page - 1) * limit;
+    let { count: totalBlogsCount, rows: totalBlogs } =
+      await Blog.findAndCountAll({
+        where: {
+          title: {
+            [Op.iLike]: `${title}%`,
+          },
+          isActive: true,
+        },
+        limit,
+        offset,
+      });
+    if (totalBlogs.length === 0) return response(res, "No blogs found!", 404);
+    let totalPages = Math.ceil(totalBlogsCount / limit);
+
+    response(res, {
+      totalPages,
+      hasNextPage: page < totalPages,
+      currentPage: page,
+      totalBlogsCount,
+      totalBlogs,
+    });
   }
 );
 export {
@@ -142,4 +201,6 @@ export {
   getMyJoinedBlogs,
   getBlogInfo,
   updateBlogById,
+  deleteBlogsById,
+  searchBlog,
 };

@@ -131,7 +131,7 @@ blogRouter
  *     requestBody:
  *        required: true
  *        content:
- *          applicaion/json:
+ *          application/json:
  *            schema:
  *              $ref: '#/components/schemas/Blogs'
  *     responses:
@@ -149,5 +149,63 @@ blogRouter
 blogRouter
   .route("/update/:blogId")
   .put(protector, checkOwner, blogController.updateBlogById);
+/**
+ * @swagger
+ *  /api/blogs/delete/{blogId}:
+ *   delete:
+ *     summary: Deletes blog by their id
+ *     tags: [Blogs]
+ *     security:
+ *       - bearerAuth: []
+ *     description: This method is to delete blogs by their id
+ *     parameters:
+ *        - in: path
+ *          name: blogId
+ *     responses:
+ *           204:
+ *            description: Successfully deleted!
+ *           401:
+ *            description: Invalid token or expired token!
+ *           404:
+ *            description: No data found!
+ *           400:
+ *            description: Invalid data entered!
+ *           500:
+ *            description: Internal server error!
+ */
+blogRouter
+  .route("/delete/:blogId")
+  .delete(protector, checkOwner, blogController.deleteBlogsById);
+/**
+ * @swagger
+ *  /api/blogs/search:
+ *   get:
+ *     summary: Search blogs by their title
+ *     tags: [Blogs]
+ *     security:
+ *       - bearerAuth: []
+ *     description: This method is to search blogs by their title
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *       - in: query
+ *         name: page
+ *       - in: query
+ *         name: title
+ *     responses:
+ *           200:
+ *            description: Successfully returned!
+ *           401:
+ *            description: Invalid token or expired token!
+ *           404:
+ *            description: No data found!
+ *           409:
+ *            description: Invalid data entered!
+ *           500:
+ *            description: Internal server error!
+ */
+blogRouter
+  .route("/search")
+  .get(protector, checkOwner, blogController.searchBlog);
 
 export default blogRouter;

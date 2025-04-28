@@ -1,6 +1,7 @@
 import { Optional } from "sequelize";
 
 export interface Blogs {
+  id?: number;
   title: string;
   content: string;
   user_id?: number;
