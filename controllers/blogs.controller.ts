@@ -8,6 +8,7 @@ import Blog from "../models/blog.model";
 import Follower from "../models/follower.model";
 import { ID } from "../types/id";
 import { Op } from "sequelize";
+import User from "../models/user.model";
 
 const blogsValidator = Joi.object({
   title: Joi.string().min(3).required(),
@@ -195,6 +196,42 @@ const searchBlog = errorHandler(
     });
   }
 );
+const joinValidator = Joi.object({
+  parent_id: Joi.number().min(1).required(),
+  blog_id: Joi.number().min(1),
+  follower_id: Joi.number().min(1).required(),
+  isActive: Joi.boolean().default(true),
+});
+
+const joinBlog = errorHandler(
+  async (req: RequestCustom, res: Response, next: NextFunction) => {
+    let { error: bodyErr, value: body } = joinValidator.validate(req.body);
+    if (bodyErr) return response(res, bodyErr.details[0].message, 409);
+    let { parent_id, blog_id, follower_id, isActive } = body;
+    follower_id = req.user?.id;
+
+    let [user, blog] = await Promise.all([
+      User.findByPk(parent_id),
+      Blog.findByPk(blog_id),
+    ]);
+
+    if (!user || !blog)
+      return response(
+        res,
+        `Provided ${!user ? "user" : "blog"} not found!`,
+        404
+      );
+
+    let joinedBlog = await Follower.create({
+      parent_id,
+      blog_id,
+      follower_id,
+      isActive,
+    });
+    response(res, joinedBlog, 201);
+  }
+);
+
 export {
   createBlog,
   getMyBlogs,
@@ -203,4 +240,5 @@ export {
   updateBlogById,
   deleteBlogsById,
   searchBlog,
+  joinBlog,
 };

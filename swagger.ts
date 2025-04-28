@@ -99,6 +99,28 @@ const swaggerSpec = swaggerJsDoc({
             isActive: true,
           },
         },
+        Followers: {
+          type: "object",
+          required: ["parent_id", "blog_id", "follower_id"],
+          properties: {
+            parent_id: {
+              type: "number",
+              description: "This is a id of a user that is being followed!",
+            },
+            blog_id: {
+              type: "number",
+              description: "This is a id of a blog that is being followed!",
+            },
+            follower_id: {
+              type: "number",
+              description: "This is a id of a user that is following!",
+            },
+          },
+          example: {
+            parent_id: 1,
+            blog_id: 1,
+          },
+        },
       },
     },
     security: [

@@ -207,5 +207,35 @@ blogRouter
 blogRouter
   .route("/search")
   .get(protector, checkOwner, blogController.searchBlog);
+/**
+ * @swagger
+ *  /api/blogs/join-blog:
+ *   post:
+ *     summary: Join blog!
+ *     tags: [Blogs]
+ *     security:
+ *       - bearerAuth: []
+ *     description: This method is used to join blogs
+ *     requestBody:
+ *        required: true
+ *        content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Followers'
+ *     responses:
+ *           201:
+ *            description: Successfully followed!
+ *           401:
+ *            description: Invalid token or expired token!
+ *           404:
+ *            description: No data found!
+ *           409:
+ *            description: Invalid data entered!
+ *           500:
+ *            description: Internal server error!
+ */
+blogRouter
+  .route("/join-blog")
+  .post(protector, checkOwner, blogController.joinBlog);
 
 export default blogRouter;
