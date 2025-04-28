@@ -1,6 +1,7 @@
 import { Optional } from "sequelize";
 
 export interface Comments {
+  id?: number;
   title: string;
   user_id: number;
   post_id?: number;
