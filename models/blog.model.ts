@@ -12,6 +12,7 @@ class Blog extends Model<Blogs, BlogCreate> implements Blogs {
   public createdAt!: Date;
   public updatedAt!: Date;
 }
+
 Blog.init(
   {
     title: { type: DataTypes.STRING, allowNull: false },
@@ -31,7 +32,7 @@ Blog.init(
   },
   { sequelize, tableName: "blogs", timestamps: true }
 );
-
+Blog.hasMany(Blog, { foreignKey: "id" });
 sequelize
   .sync({ alter: true })
   .then(() => {

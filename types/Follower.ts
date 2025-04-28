@@ -6,5 +6,6 @@ export interface Followers {
   blog_id?: number;
   follower_id: number;
   createdAt: Date;
+  isActive: boolean;
 }
 export interface FollowerCreate extends Optional<Followers, "createdAt"> {}

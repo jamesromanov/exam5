@@ -5,6 +5,8 @@ import Joi, { ValidationResult } from "joi";
 import { Blogs } from "../types/Blogs";
 import { response } from "../utils/response";
 import Blog from "../models/blog.model";
+import Follower from "../models/follower.model";
+import { ID } from "../types/id";
 
 const blogsValidator = Joi.object({
   title: Joi.string().min(3).required(),
@@ -55,7 +57,89 @@ const getMyBlogs = errorHandler(
 
 const getMyJoinedBlogs = errorHandler(
   async (req: RequestCustom, res: Response, next: NextFunction) => {
+    let limit = Number(req.query.limit);
+    let page = Number(req.query.page);
+
+    if (isNaN(limit) || limit < 1) limit = 10;
+    if (isNaN(page) || page < 1) page = 1;
+
+    let offset = (page - 1) * limit;
     let parentId = req.user?.id;
+    let { count: totalJoinsCound, rows: totalFollowed } =
+      await Follower.findAndCountAll({
+        where: {
+          follower_id: parentId,
+        },
+        attributes: [],
+        include: [
+          {
+            model: Blog,
+            attributes: ["title", "content", "image"],
+          },
+        ],
+        limit,
+        offset,
+      });
+
+    if (!totalFollowed.length)
+      return response(res, "No joined blogs found!", 404);
+    let totalPages = Math.ceil(totalJoinsCound / limit);
+    response(res, {
+      totalPages,
+      currentPage: page,
+      hasNextPage: page < totalPages,
+      totalJoinsCound,
+      totalFollowed,
+    });
   }
 );
-export { createBlog, getMyBlogs };
+const idValidator = Joi.object({
+  blogId: Joi.number().min(1).required(),
+});
+const getBlogInfo = errorHandler(
+  async (req: RequestCustom, res: Response, next: NextFunction) => {
+    console.log(req.params);
+    let { error: idErr, value: polishedId }: ValidationResult<ID> =
+      idValidator.validate(req.params);
+    if (idErr) return response(res, idErr.details[0].message, 409);
+    let blog = await Blog.findByPk(polishedId.blogId);
+    console.log(blog);
+    if (!blog) return response(res, "No blogs found!", 404);
+
+    response(res, blog);
+  }
+);
+const updateValidator = Joi.object({
+  title: Joi.string().min(4),
+  content: Joi.string().min(3),
+  user_id: Joi.number().min(1),
+  image: Joi.string().min(3),
+  isActive: Joi.boolean().default(true),
+});
+const updateBlogById = errorHandler(
+  async (req: RequestCustom, res: Response, next: NextFunction) => {
+    let { error: idErr, value: polishedId }: ValidationResult<ID> =
+      idValidator.validate(req.params);
+    if (idErr) return response(res, idErr.details[0].message, 409);
+
+    let { error: bodyErr, value: body } = updateValidator.validate(req.body);
+    console.log(req.body);
+    if (bodyErr) return response(res, bodyErr.details[0].message, 409);
+    let blog = await Blog.findByPk(polishedId.blogId);
+    if (!blog) return response(res, "No blogs found!", 404);
+    if (body.title) blog.title = body.title ?? blog.title;
+    if (body.content) blog.content = body.content ?? blog.content;
+    if (body.user_id) blog.user_id = body.user_id ?? blog.user_id;
+    if (body.image) blog.image = body.image ?? blog.image;
+    if (body.isActive) blog.isActive = body.isActive ?? blog.isActive;
+    await blog.save();
+    response(res, blog);
+  }
+);
+export {
+  createBlog,
+  getMyBlogs,
+  getMyJoinedBlogs,
+  getBlogInfo,
+  updateBlogById,
+};

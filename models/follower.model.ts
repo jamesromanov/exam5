@@ -1,16 +1,18 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/db";
 import { FollowerCreate, Followers } from "../types/Follower";
+import Blog from "./blog.model";
 
-class Blog extends Model<Followers, FollowerCreate> implements Followers {
+class Follower extends Model<Followers, FollowerCreate> implements Followers {
   public id!: number;
   public parent_id!: number;
   public post_id!: number;
   public blog_id!: number;
   public follower_id!: number;
   public createdAt!: Date;
+  public isActive!: boolean;
 }
-Blog.init(
+Follower.init(
   {
     parent_id: {
       type: DataTypes.NUMBER,
@@ -30,13 +32,10 @@ Blog.init(
     createdAt: {
       type: DataTypes.DATE,
     },
-    updatedAt: {
-      type: DataTypes.DATE,
-    },
   },
-  { sequelize, tableName: "blogs", timestamps: true }
+  { sequelize, tableName: "followers", timestamps: false }
 );
-
+Follower.belongsTo(Blog, { foreignKey: "blog_id" });
 sequelize
   .sync({ alter: true })
   .then(() => {
@@ -46,4 +45,4 @@ sequelize
     // console.log("Error while creating table:", err);
   });
 
-export default Blog;
+export default Follower;
