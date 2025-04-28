@@ -237,5 +237,59 @@ blogRouter
 blogRouter
   .route("/join-blog")
   .post(protector, checkOwner, blogController.joinBlog);
+/**
+ * @swagger
+ *  /api/blogs/leave-blog/{blogId}:
+ *   delete:
+ *     summary: Leave block!
+ *     tags: [Blogs]
+ *     security:
+ *       - bearerAuth: []
+ *     description: This method is to leave the blog
+ *     parameters:
+ *       - in: path
+ *         name: blogId
+ *     responses:
+ *           200:
+ *            description: Successfully left!
+ *           401:
+ *            description: Invalid token or expired token!
+ *           404:
+ *            description: No data found!
+ *           409:
+ *            description: Invalid data entered!
+ *           500:
+ *            description: Internal server error!
+ */
+blogRouter
+  .route("/leave-blog/:blogId")
+  .delete(protector, blogController.leaveBlog);
+/**
+ * @swagger
+ *  /api/blogs/get-users/{blogId}:
+ *    get:
+ *     summary: Returns blog followers!
+ *     tags: [Blogs]
+ *     security:
+ *       - bearerAuth: []
+ *     description: This method is usd to return follows of the blog
+ *     parameters:
+ *       - in: path
+ *         name: blogId
+ *     responses:
+ *           200:
+ *            description: Successfully returned!
+ *           401:
+ *            description: Invalid token or expired token!
+ *           404:
+ *            description: No data found!
+ *           409:
+ *            description: Invalid data entered!
+ *           500:
+ *            description: Internal server error!
+ */
+blogRouter
+  .route("/get-users/:blogId")
+  .get(protector, checkOwner, blogController.getUsers);
 
 export default blogRouter;

@@ -121,6 +121,35 @@ const swaggerSpec = swaggerJsDoc({
             blog_id: 1,
           },
         },
+        Posts: {
+          type: "object",
+          required: ["title", "content", "isActive"],
+          properties: {
+            title: {
+              type: "string",
+              description: "This is a title of the post!",
+            },
+            content: {
+              type: "string",
+              description: "This is a content of the post!",
+            },
+            image: {
+              type: "string",
+              description: "This is a image of the post!",
+            },
+            isActive: {
+              type: "boolean",
+              description: "This is a status of the post!",
+            },
+          },
+          example: {
+            title: "My new post",
+            content: "Some content about this post!",
+            image: "none",
+            blog_id: 1,
+            isActive: true,
+          },
+        },
       },
     },
     security: [
@@ -131,6 +160,7 @@ const swaggerSpec = swaggerJsDoc({
     tags: [
       { name: "Users", description: "This is a user crud!" },
       { name: "Blogs", description: "This is a blog crud!" },
+      { name: "Posts", description: "This is a post crud!" },
     ],
   },
   apis: ["./swagger.ts", "./routes/*.ts"],

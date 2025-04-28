@@ -50,6 +50,7 @@ CREATE TABLE "posts" (
 	"createdAt" TIMESTAMP DEFAULT current_timestamp,
 	"updatedAt" TIMESTAMP,
 	"isActive" BOOLEAN DEFAULT true,
+	"blog_id" BIGINT,
 	PRIMARY KEY("id")
 );
 
@@ -60,7 +61,6 @@ CREATE TABLE "followers" (
 	"blog_id" BIGINT,
 	"follower_id" BIGINT,
 	"createdAt" TIMESTAMP DEFAULT current_timestamp,
-	"isActive" BOOLEAN DEFAULT true,
 	PRIMARY KEY("id")
 );
 CREATE INDEX "followers_index_0"
@@ -73,6 +73,16 @@ CREATE TABLE "logger" (
 	"method" VARCHAR(255),
 	PRIMARY KEY("id")
 );
+
+CREATE TABLE "views" (
+	"id" BIGSERIAL NOT NULL UNIQUE,
+	"post_id" BIGINT,
+	"blog_id" BIGINT,
+	"views_count" BIGINT,
+	PRIMARY KEY("id")
+);
+CREATE INDEX "views_index_0"
+ON "views" ();
 
 ALTER TABLE "blogs"
 ADD FOREIGN KEY("user_id") REFERENCES "users"("id")
@@ -108,4 +118,16 @@ ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 ALTER TABLE "comments"
 ADD FOREIGN KEY("blog_id") REFERENCES "blogs"("id")
+ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE "posts"
+ADD FOREIGN KEY("blog_id") REFERENCES "blogs"("id")
+ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE "views"
+ADD FOREIGN KEY("blog_id") REFERENCES "blogs"("id")
+ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE "views"
+ADD FOREIGN KEY("post_id") REFERENCES "posts"("id")
 ON UPDATE NO ACTION ON DELETE NO ACTION;

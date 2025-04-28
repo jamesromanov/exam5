@@ -2,7 +2,7 @@ import { NextFunction, Response, Request } from "express";
 import { RequestCustom, UserPro } from "../types/User";
 import errorHandler from "../utils/errorHandler";
 import Joi, { ValidationResult } from "joi";
-import { BlogOwner, Blogs } from "../types/Blogs";
+import { Blogs } from "../types/Blogs";
 import { response } from "../utils/response";
 import Blog from "../models/blog.model";
 import Follower from "../models/follower.model";
@@ -157,8 +157,7 @@ const deleteBlogsById = errorHandler(
     });
     if (!blogExists) return response(res, "No blogs found!", 404);
 
-    blogExists.isActive = false;
-    await blogExists.save();
+    await blogExists.update({ isActive: false });
     response(res, null, 204);
   }
 );
@@ -199,7 +198,6 @@ const searchBlog = errorHandler(
 const joinValidator = Joi.object({
   parent_id: Joi.number().min(1).required(),
   blog_id: Joi.number().min(1),
-  follower_id: Joi.number().min(1).required(),
   isActive: Joi.boolean().default(true),
 });
 
@@ -231,6 +229,41 @@ const joinBlog = errorHandler(
     response(res, joinedBlog, 201);
   }
 );
+const leaveBlog = errorHandler(
+  async (req: RequestCustom, res: Response, next: NextFunction) => {
+    let { error: idErr, value: polishedId }: ValidationResult<ID> =
+      idValidator.validate(req.params);
+    if (idErr) return response(res, idErr.details[0].message, 409);
+
+    let blogExists = await Follower.findOne({
+      where: {
+        blog_id: polishedId.blogId,
+        follower_id: req.user?.id,
+        isActive: true,
+      },
+    });
+    if (!blogExists) return response(res, "No follows found!", 404);
+    await blogExists.update({ isActive: false });
+
+    response(res, "You successfully unfollowed the blog!", 200);
+  }
+);
+
+const getUsers = errorHandler(
+  async (req: RequestCustom, res: Response, next: NextFunction) => {
+    let { error: idErr, value: polishedId }: ValidationResult<ID> =
+      idValidator.validate(req.params);
+    if (idErr) return response(res, idErr.details[0].message, 409);
+    let followers = await Follower.findOne({
+      where: {
+        blog_id: polishedId.blogId,
+        isActive: true,
+      },
+    });
+    if (!followers) return response(res, "No blogs found!", 404);
+    response(res, followers);
+  }
+);
 
 export {
   createBlog,
@@ -241,4 +274,6 @@ export {
   deleteBlogsById,
   searchBlog,
   joinBlog,
+  leaveBlog,
+  getUsers,
 };
