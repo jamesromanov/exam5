@@ -4,7 +4,6 @@ import Post from "../models/post.mode";
 import { response } from "../utils/response";
 import { RequestCustom } from "../types/User";
 import View from "../models/veiws";
-import { Posts, PostUpdate } from "../types/posts";
 
 const create = errorHandler(
   async (req: RequestCustom, res: Response, next: NextFunction) => {
@@ -28,7 +27,9 @@ const create = errorHandler(
 const getAll = errorHandler(
   async (req: RequestCustom, res: Response, next: NextFunction) => {
     let blogId = req.params.blogId;
-    let posts = await Post.findAll({ where: { blog_id: blogId } });
+    let posts = await Post.findAll({
+      where: { blog_id: blogId, isActive: true },
+    });
     if (!posts) return response(res, "No posts found!", 404);
 
     response(res, posts);
@@ -39,7 +40,7 @@ const getById = errorHandler(
   async (req: RequestCustom, res: Response, next: NextFunction) => {
     let postId = req.params.postId;
 
-    let post = await Post.findByPk(postId);
+    let post = await Post.findOne({ where: { id: postId, isActive: true } });
     if (!post) return response(res, "Post not found!", 404);
     let views = await View.findOne({
       where: { post_id: postId, blog_id: post.blog_id },
@@ -54,6 +55,7 @@ const getById = errorHandler(
     } else {
       let viewsCount = +views.views_count;
       await views.update({ views_count: (viewsCount += 1) });
+      await views.save();
     }
     response(res, post);
   }
@@ -64,7 +66,7 @@ const updatePost = errorHandler(
     let body = req.body;
 
     let post = await Post.findOne({
-      where: { id: req.params.postId },
+      where: { id: req.params.postId, isActive: true },
     });
     if (!post) return response(res, "Post not found!", 404);
 
@@ -77,4 +79,28 @@ const updatePost = errorHandler(
     response(res, post);
   }
 );
-export { create, getAll, getById, updatePost };
+
+const deletePostByid = errorHandler(
+  async (req: RequestCustom, res: Response, next: NextFunction) => {
+    let postId = req.params.postId;
+
+    let post = await Post.findByPk(postId);
+    if (!post) return response(res, "No post found!", 404);
+
+    await post.update({ isActive: false });
+    await post.save();
+
+    response(res, null, 204);
+  }
+);
+const sortByDate = errorHandler(
+  async (req: RequestCustom, res: Response, next: NextFunction) => {
+    let posts = await Post.findAll({
+      where: { isActive: true },
+      order: [["createdAt", "desc"]],
+    });
+
+    response(res, posts);
+  }
+);
+export { create, getAll, getById, updatePost, deletePostByid, sortByDate };

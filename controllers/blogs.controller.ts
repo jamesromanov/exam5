@@ -158,6 +158,7 @@ const deleteBlogsById = errorHandler(
     if (!blogExists) return response(res, "No blogs found!", 404);
 
     await blogExists.update({ isActive: false });
+    await blogExists.save();
     response(res, null, 204);
   }
 );
@@ -244,6 +245,7 @@ const leaveBlog = errorHandler(
     });
     if (!blogExists) return response(res, "No follows found!", 404);
     await blogExists.update({ isActive: false });
+    await blogExists.save();
 
     response(res, "You successfully unfollowed the blog!", 200);
   }

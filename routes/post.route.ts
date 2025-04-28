@@ -117,4 +117,51 @@ postRouter
 postRouter
   .route("/update/:postId")
   .put(protector, checkOwner, postController.updatePost);
+/**
+ * @swagger
+ *  /api/posts/delete/{postId}:
+ *   delete:
+ *     summary: delete post by id
+ *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
+ *     description: This method is to delete posts by id!
+ *     parameters:
+ *        - in: path
+ *          name: postId
+ *     responses:
+ *           204:
+ *            description: Successfully deleted!
+ *           401:
+ *            description: Invalid token or expired token!
+ *           409:
+ *            description: Invalid data entered!
+ *           500:
+ *            description: Internal server error!
+ */
+postRouter
+  .route("/delete/:postId")
+  .delete(protector, checkOwner, postController.deletePostByid);
+/**
+ * @swagger
+ *  /api/posts/sort-by-date :
+ *   get:
+ *     summary: returns post by date sort
+ *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
+ *     description: This method is to return the post by the lates ones!
+ *     responses:
+ *           204:
+ *            description: Successfully deleted!
+ *           401:
+ *            description: Invalid token or expired token!
+ *           409:
+ *            description: Invalid data entered!
+ *           500:
+ *            description: Internal server error!
+ */
+postRouter
+  .route("/sort-by-date")
+  .get(protector, checkOwner, postController.sortByDate);
 export default postRouter;
