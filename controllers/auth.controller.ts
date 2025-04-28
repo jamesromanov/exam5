@@ -46,7 +46,14 @@ const register = errorHandler(
       );
     }
 
-    let user = await User.create(body);
+    let user = await User.create({
+      name,
+      email,
+      age,
+      password,
+      role,
+      isActive,
+    });
     let hiddenDetails = JSON.parse(JSON.stringify(user)) as UserHidden;
     delete hiddenDetails.role;
     delete hiddenDetails.password;

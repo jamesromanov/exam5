@@ -1,4 +1,5 @@
 import { Optional } from "sequelize";
+import { Request } from "express";
 
 interface Users {
   name: string;
@@ -27,5 +28,11 @@ interface UserHidden {
   createdAt: Date;
   updatedAt: Date;
 }
+interface UserPro extends Users {
+  id: number;
+}
+interface RequestCustom extends Request {
+  user?: UserPro;
+}
 
-export { Users, UsersCreate, UserLogin, UserHidden };
+export { Users, UsersCreate, UserLogin, UserHidden, UserPro, RequestCustom };

@@ -60,6 +60,7 @@ CREATE TABLE "followers" (
 	"blog_id" BIGINT,
 	"follower_id" BIGINT,
 	"createdAt" TIMESTAMP DEFAULT current_timestamp,
+	"isActive" BOOLEAN DEFAULT true,
 	PRIMARY KEY("id")
 );
 CREATE INDEX "followers_index_0"

@@ -67,6 +67,38 @@ const swaggerSpec = swaggerJsDoc({
             password: "Somepassword!3@",
           },
         },
+        Blogs: {
+          type: "object",
+          required: ["title", "content", "isActive"],
+          properties: {
+            title: {
+              type: "string",
+              description: "This is a title of the blog!",
+            },
+            content: {
+              type: "string",
+              description: "This is a content of the blog!",
+            },
+            user_id: {
+              type: "number",
+              description: "This is user of the blog!",
+            },
+            image: {
+              type: "string",
+              description: "This is a image of the blog!",
+            },
+            isActive: {
+              type: "boolean",
+              description: "This is a status of the blog!",
+            },
+          },
+          example: {
+            title: "My new blog",
+            content: "Some content about this blog!",
+            image: "none",
+            isActive: true,
+          },
+        },
       },
     },
     security: [
@@ -74,7 +106,10 @@ const swaggerSpec = swaggerJsDoc({
         bearerAuth: [],
       },
     ],
-    tags: [{ name: "Users", description: "This is a user crud!" }],
+    tags: [
+      { name: "Users", description: "This is a user crud!" },
+      { name: "Blogs", description: "This is a blog crud!" },
+    ],
   },
   apis: ["./swagger.ts", "./routes/*.ts"],
 });
