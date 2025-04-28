@@ -68,7 +68,7 @@ ON "followers" ("parent_id", "post_id", "blog_id", "follower_id");
 
 CREATE TABLE "logger" (
 	"id" BIGSERIAL NOT NULL UNIQUE,
-	"time" TIMESTAMP DEFAULT current_timestamp,
+	"time" VARCHAR(255) DEFAULT current_timestamp,
 	"ip" VARCHAR(255),
 	"method" VARCHAR(255),
 	PRIMARY KEY("id")

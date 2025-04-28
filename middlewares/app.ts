@@ -7,12 +7,14 @@ import morgan from "morgan";
 import blogRouter from "../routes/blog.route";
 import postRouter from "../routes/post.route";
 import commentsRouter from "../routes/comment.route";
+import logGer from "../utils/logger";
 
 const app = express();
 app.use(express.json());
 app.use(morgan("dev"));
 app.use(cookieParser());
 
+app.use(logGer);
 app.use("/api/auth", authRouter);
 app.use("/api/blogs", blogRouter);
 app.use("/api/posts", postRouter);
