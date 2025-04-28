@@ -164,4 +164,29 @@ postRouter
 postRouter
   .route("/sort-by-date")
   .get(protector, checkOwner, postController.sortByDate);
+/**
+ * @swagger
+ *  /api/posts/{postId}/get-comments:
+ *   get:
+ *     summary: returns comments of the post
+ *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
+ *     description: This method is to return the post by the lates ones!
+ *     parameters:
+ *        - in: path
+ *          name: postId
+ *     responses:
+ *           200:
+ *            description: Successfully returned!
+ *           401:
+ *            description: Invalid token or expired token!
+ *           409:
+ *            description: Invalid data entered!
+ *           500:
+ *            description: Internal server error!
+ */
+postRouter
+  .route("/:postId/get-comments")
+  .get(protector, checkOwner, postController.getComments);
 export default postRouter;

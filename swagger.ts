@@ -150,6 +150,34 @@ const swaggerSpec = swaggerJsDoc({
             isActive: true,
           },
         },
+        Comments: {
+          type: "object",
+          required: ["title", "user_id", "post_id"],
+          properties: {
+            title: {
+              type: "string",
+              description: "This is a title of the post!",
+            },
+            user_id: {
+              type: "number",
+              description: "This is a id of the user",
+            },
+            post_id: {
+              type: "number",
+              description: "This is a id of the post!",
+            },
+            isActive: {
+              type: "boolean",
+              description: "This is a status of the comment!",
+            },
+          },
+          example: {
+            title: "My new post",
+            user_id: 1,
+            post_id: 1,
+            isActive: true,
+          },
+        },
       },
     },
     security: [
@@ -161,6 +189,7 @@ const swaggerSpec = swaggerJsDoc({
       { name: "Users", description: "This is a user crud!" },
       { name: "Blogs", description: "This is a blog crud!" },
       { name: "Posts", description: "This is a post crud!" },
+      { name: "Comments", description: "This is a Comment crud!" },
     ],
   },
   apis: ["./swagger.ts", "./routes/*.ts"],

@@ -4,6 +4,7 @@ import Post from "../models/post.mode";
 import { response } from "../utils/response";
 import { RequestCustom } from "../types/User";
 import View from "../models/veiws";
+import Comment from "../models/comments";
 
 const create = errorHandler(
   async (req: RequestCustom, res: Response, next: NextFunction) => {
@@ -103,4 +104,28 @@ const sortByDate = errorHandler(
     response(res, posts);
   }
 );
-export { create, getAll, getById, updatePost, deletePostByid, sortByDate };
+
+const getComments = errorHandler(
+  async (req: RequestCustom, res: Response, next: NextFunction) => {
+    console.log(req.user?.id);
+    let postId = req.params.postId;
+    let post = await Post.findOne({ where: { id: postId, isActive: true } });
+    if (!post) return response(res, "No posts found!", 404);
+
+    let comments = await Comment.findAll({
+      where: { post_id: post.id, user_id: req.user?.id },
+    });
+    if (!comments) return response(res, "No comments found!", 404);
+
+    response(res, comments);
+  }
+);
+export {
+  create,
+  getAll,
+  getById,
+  updatePost,
+  deletePostByid,
+  sortByDate,
+  getComments,
+};
